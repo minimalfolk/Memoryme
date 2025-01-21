@@ -11,6 +11,7 @@
       padding: 0;
       background-color: #f4f4f9;
     }
+
     header {
       display: flex;
       justify-content: space-between;
@@ -19,28 +20,34 @@
       background-color: #4CAF50;
       color: white;
     }
+
     .logo {
       font-size: 24px;
       font-weight: bold;
     }
+
     nav a {
       margin: 0 10px;
       text-decoration: none;
       color: white;
     }
+
     nav a:hover {
       text-decoration: underline;
     }
+
     .search-bar {
       text-align: center;
       margin: 20px 0;
     }
+
     .search-bar input {
       padding: 10px;
       width: 300px;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+
     .search-bar button {
       padding: 10px 20px;
       background-color: #007BFF;
@@ -49,9 +56,11 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
     .search-bar button:hover {
       background-color: #0056b3;
     }
+
     form {
       max-width: 500px;
       margin: 0 auto;
@@ -60,15 +69,18 @@
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
     form h2 {
       text-align: center;
       margin-bottom: 20px;
     }
+
     form label {
       display: block;
       margin-bottom: 8px;
       font-weight: bold;
     }
+
     form input, form textarea {
       width: 100%;
       padding: 10px;
@@ -76,6 +88,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+
     form button {
       width: 100%;
       padding: 10px;
@@ -85,9 +98,47 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
     form button:hover {
       background-color: #218838;
     }
+
+    /* File upload preview */
+    #filePreview {
+      display: block;
+      margin-top: 10px;
+      max-width: 100%;
+      max-height: 200px;
+    }
+
+    /* Previous Memories Section */
+    #previousMemories {
+      margin-top: 40px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .memory-item {
+      padding: 15px;
+      margin: 10px 0;
+      background-color: #e7f3e7;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 600px) {
+      .search-bar input {
+        width: 80%;
+      }
+      form {
+        width: 90%;
+        padding: 15px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -107,6 +158,7 @@
   <div class="search-bar">
     <input type="text" placeholder="Search previous memories..." id="searchInput">
     <button onclick="searchMemories()">Search</button>
+    <p id="searchResults"></p> <!-- Display search results here -->
   </div>
 
   <!-- Add New Memory Section -->
@@ -114,30 +166,135 @@
     <h2>Add New Memory</h2>
     <label for="memoryTitle">Title:</label>
     <input type="text" id="memoryTitle" placeholder="Memory Title" required>
+
     <label for="memoryContent">Description:</label>
     <textarea id="memoryContent" placeholder="Write your memory..." required></textarea>
+
     <label for="memoryFile">Upload Image/Video:</label>
-    <input type="file" id="memoryFile" accept="image/*,video/*">
+    <input type="file" id="memoryFile" accept="image/*,video/*" onchange="previewFile()">
+
+    <!-- Preview image or video -->
+    <img id="filePreview" src="" alt="Preview will appear here" style="display:none;">
+
     <button type="submit">Add Memory</button>
   </form>
 
+  <!-- Previous Memories Section -->
+  <div id="previousMemories">
+    <h3>Previous Memories</h3>
+    <div id="memoryList"></div> <!-- Display Previous Memories here -->
+  </div>
+
   <script>
-    // Search Functionality
-    function searchMemories() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      alert("Searching for: " + query);
-      // Add backend API call here to fetch results
+    // Fetch previous memories from localStorage
+    function loadMemories() {
+      const memories = JSON.parse(localStorage.getItem('memories')) || [];
+      const memoryList = document.getElementById("memoryList");
+
+      // Clear previous memories
+      memoryList.innerHTML = '';
+
+      memories.forEach(memory => {
+        const memoryItem = document.createElement("div");
+        memoryItem.classList.add("memory-item");
+
+        const memoryTitle = document.createElement("h4");
+        memoryTitle.textContent = memory.title;
+
+        const memoryContent = document.createElement("p");
+        memoryContent.textContent = memory.content;
+
+        const timestamp = document.createElement("p");
+        timestamp.style.fontStyle = "italic";
+        timestamp.textContent = memory.timestamp;
+
+        memoryItem.appendChild(memoryTitle);
+        memoryItem.appendChild(memoryContent);
+        memoryItem.appendChild(timestamp);
+
+        memoryList.appendChild(memoryItem);
+      });
     }
 
     // Add New Memory Functionality
     document.getElementById("memoryForm").addEventListener("submit", function(e) {
       e.preventDefault();
+
       const title = document.getElementById("memoryTitle").value;
       const content = document.getElementById("memoryContent").value;
       const file = document.getElementById("memoryFile").files[0];
-      alert("Memory Saved:\n" + "Title: " + title + "\nDescription: " + content + "\nFile: " + (file ? file.name : "No file uploaded"));
-      // Add backend API call to save the memory
+      const timestamp = new Date().toLocaleString();
+
+      if (!title || !content) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const newMemory = {
+        title,
+        content,
+        timestamp,
+        file: file ? file.name : null
+      };
+
+      // Save memory to localStorage
+      const memories = JSON.parse(localStorage.getItem('memories')) || [];
+      memories.unshift(newMemory); // Add the new memory to the beginning
+      localStorage.setItem('memories', JSON.stringify(memories));
+
+      alert("Memory Saved!");
+
+      // Reset the form
+      document.getElementById("memoryForm").reset();
+      document.getElementById("filePreview").style.display = "none";
+
+      loadMemories(); // Reload memories after adding a new one
     });
+
+    // Search Functionality
+    function searchMemories() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const searchResults = document.getElementById("searchResults");
+
+      // Check if query is empty
+      if (!query) {
+        searchResults.textContent = "Please enter a search term.";
+        return;
+      }
+
+      const memories = JSON.parse(localStorage.getItem('memories')) || [];
+      const filteredMemories = memories.filter(memory =>
+        memory.title.toLowerCase().includes(query) ||
+        memory.content.toLowerCase().includes(query)
+      );
+
+      // Display search results
+      if (filteredMemories.length > 0) {
+        searchResults.textContent = "Found " + filteredMemories.length + " result(s).";
+      } else {
+        searchResults.textContent = "No results found.";
+      }
+    }
+
+    // File Preview Functionality
+    function previewFile() {
+      const file = document.getElementById("memoryFile").files[0];
+      const preview = document.getElementById("filePreview");
+
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = "block"; // Show the image preview
+        };
+
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Load previous memories when the page loads
+    document.addEventListener("DOMContentLoaded", loadMemories);
   </script>
 
 </body>
