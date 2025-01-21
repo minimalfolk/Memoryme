@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Jar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: white;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .search-bar {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .search-bar input {
+      padding: 10px;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .search-bar button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .search-bar button:hover {
+      background-color: #0056b3;
+    }
+    form {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    form h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    form input, form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form button {
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    form button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <div class="logo">Memory Jar</div>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="#login">Login</a>
+    </nav>
+  </header>
+
+  <!-- Search Section -->
+  <div class="search-bar">
+    <input type="text" placeholder="Search previous memories..." id="searchInput">
+    <button onclick="searchMemories()">Search</button>
+  </div>
+
+  <!-- Add New Memory Section -->
+  <form id="memoryForm">
+    <h2>Add New Memory</h2>
+    <label for="memoryTitle">Title:</label>
+    <input type="text" id="memoryTitle" placeholder="Memory Title" required>
+    <label for="memoryContent">Description:</label>
+    <textarea id="memoryContent" placeholder="Write your memory..." required></textarea>
+    <label for="memoryFile">Upload Image/Video:</label>
+    <input type="file" id="memoryFile" accept="image/*,video/*">
+    <button type="submit">Add Memory</button>
+  </form>
+
+  <script>
+    // Search Functionality
+    function searchMemories() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      alert("Searching for: " + query);
+      // Add backend API call here to fetch results
+    }
+
+    // Add New Memory Functionality
+    document.getElementById("memoryForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const title = document.getElementById("memoryTitle").value;
+      const content = document.getElementById("memoryContent").value;
+      const file = document.getElementById("memoryFile").files[0];
+      alert("Memory Saved:\n" + "Title: " + title + "\nDescription: " + content + "\nFile: " + (file ? file.name : "No file uploaded"));
+      // Add backend API call to save the memory
+    });
+  </script>
+
+</body>
+</html>
